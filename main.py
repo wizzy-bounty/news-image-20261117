@@ -494,14 +494,7 @@ def _copy_bundled(out_path):
     print("entry.png bytes:", os.path.getsize(out_path))
 
 
-def main():
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
-    os.makedirs(out_dir, exist_ok=True)
-    path = os.path.join(out_dir, "entry.png")
-    if not _HAVE_PIL:
-        _copy_bundled(path)
-        return
-    render()
+def _save_entry(path):
     out = _img.resize((W, H), Image.LANCZOS)
     # Flat vector art quantizes cleanly: a 128-colour palette keeps the
     # picture identical to the eye and shrinks the file (ties break toward
@@ -513,6 +506,17 @@ def main():
         out.convert("RGB").save(path, "JPEG", quality=88)
         n = os.path.getsize(path)
     print("entry.png bytes:", n)
+
+
+def main():
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
+    os.makedirs(out_dir, exist_ok=True)
+    path = os.path.join(out_dir, "entry.png")
+    if not _HAVE_PIL:
+        _copy_bundled(path)
+        return
+    render()
+    _save_entry(path)
 
 
 if __name__ == "__main__":
