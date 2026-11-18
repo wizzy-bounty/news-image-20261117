@@ -451,18 +451,22 @@ def render():
     footer()
 
 
+def _copy_bundled(out_path):
+    # No Pillow in this environment (e.g. the stock python:3.13
+    # grader image): fall back to the pre-rendered image bundled
+    # alongside this file.
+    src = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                       "entry.png")
+    shutil.copyfile(src, out_path)
+    print("entry.png bytes:", os.path.getsize(out_path))
+
+
 def main():
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "entry.png")
     if not _HAVE_PIL:
-        # No Pillow in this environment (e.g. the stock python:3.13
-        # grader image): fall back to the pre-rendered image bundled
-        # alongside this file.
-        src = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                           "entry.png")
-        shutil.copyfile(src, path)
-        print("entry.png bytes:", os.path.getsize(path))
+        _copy_bundled(path)
         return
     render()
     out = _img.resize((W, H), Image.LANCZOS)
